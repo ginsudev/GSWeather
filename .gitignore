@@ -1,3 +1,5 @@
 .DS_Store
 GSWeather.xcodeproj/xcuserdata
 GSWeather.xcodeproj/project.xcworkspace/xcuserdata
+.theos
+packages
