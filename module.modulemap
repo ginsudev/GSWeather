@@ -1,0 +1,13 @@
+//
+//  module.modulemap
+//  GSWeather
+//
+//  Created by Noah Little on 25/4/2023.
+//
+
+framework module GSWeather {
+    umbrella header "GSWeather.h"
+    
+    export *
+    module * { export * }
+}
