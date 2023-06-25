@@ -7,14 +7,14 @@
 
 import Foundation
 
-protocol URLBuildable {
+internal protocol URLBuildable {
     var scheme: String { get }
     var host: String { get }
     var path: String { get }
     var queryItems: [URLQueryItem] { get }
 }
 
-extension URLBuildable {
+internal extension URLBuildable {
     var scheme: String { "https" }
     
     func url() -> URL? {

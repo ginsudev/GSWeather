@@ -50,7 +50,7 @@ private extension WeatherProvider {
         
         // Wait until location name and weather have been stored, then merge and send.
         Publishers.Zip(fetchedWeather, locationName)
-            .map { WeatherModel(temperature: $0.temperature, placeName: $1) }
+            .map { WeatherModel(displayable: $0, locationName: $1) }
             .sink { [weak self] in self?.currentWeather.send($0) }
             .store(in: &bag)
     }

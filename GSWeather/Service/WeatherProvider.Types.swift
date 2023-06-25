@@ -24,19 +24,11 @@ public extension WeatherProvider {
             case .fahrenheit: return "°F"
             }
         }
-        
-        public static var current: Self {
-            switch UnitTemperature.current {
-            case .celsius: return .celsius
-            case .fahrenheit: return .fahrenheit
-            default: return .celsius
-            }
-        }
     }
     
     enum Provider: URLBuildable {
-        // https://api.open-meteo.com/v1/forecast?latitude=-33.87&longitude=151.21&current_weather=true
-        case meteo(location: CLLocation, unit: TemperatureUnit = .current)
+        // https://api.open-meteo.com/v1/forecast?latitude=-33.87&longitude=151.21&daily=temperature_2m_max,temperature_2m_min,sunrise,sunset&current_weather=true&temperature_unit=celsius&forecast_days=1&timezone=auto
+        case meteo(location: CLLocation, timezone: TimeZone)
         
         var host: String {
             switch self {
@@ -52,19 +44,16 @@ public extension WeatherProvider {
         
         var queryItems: [URLQueryItem] {
             switch self {
-            case let .meteo(location, unit):
+            case let .meteo(location, timezone):
                 return [
                     .init(name: "latitude", value: "\(location.coordinate.latitude)"),
                     .init(name: "longitude", value: "\(location.coordinate.longitude)"),
+                    .init(name: "daily", value: "temperature_2m_max,temperature_2m_min,sunrise,sunset"),
                     .init(name: "current_weather", value: "true"),
-                    .init(name: "temperature_unit", value: unit.rawValue)
+                    .init(name: "temperature_unit", value: "celsius"),
+                    .init(name: "forecast_days", value: "1"),
+                    .init(name: "timezone", value: timezone.identifier)
                 ]
-            }
-        }
-        
-        var unit: TemperatureUnit {
-            switch self {
-            case let .meteo(_, unit): return unit
             }
         }
         
