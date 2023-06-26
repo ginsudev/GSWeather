@@ -3,7 +3,7 @@ ROOTLESS ?= 0
 # Build config
 ARCHS = arm64 arm64e
 THEOS_DEVICE_IP = localhost -p 2222
-PACKAGE_VERSION = 1.0.0
+PACKAGE_VERSION = 1.1.0
 
 # Rootless / Rootful settings
 ifeq ($(ROOTLESS),1)
