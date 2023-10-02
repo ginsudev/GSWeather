@@ -3,7 +3,7 @@ ROOTLESS ?= 0
 # Build config
 ARCHS = arm64 arm64e
 THEOS_DEVICE_IP = localhost -p 2222
-PACKAGE_VERSION = 1.1.0
+PACKAGE_VERSION = 1.1.1
 
 # Rootless / Rootful settings
 ifeq ($(ROOTLESS),1)
@@ -38,14 +38,13 @@ before-package::
 		-e 's/\$${VERSION}/$(PACKAGE_VERSION)/g' \
 		-e 's/\$${PKG_NAME_SUFFIX}/$(PKG_NAME_SUFFIX)/g' \
 		$(THEOS_STAGING_DIR)/DEBIAN/control$(ECHO_END)
-	
+
+ifeq ($(ROOTLESS),1)
 	# Move to staging dir
 	$(ECHO_NOTHING)mkdir -p $(THEOS_STAGING_DIR)$(GSWEATHER_INSTALL_PATH)$(ECHO_END)
 	$(ECHO_NOTHING)mv $(THEOS_OBJ_DIR)/GSWeather.framework/ $(THEOS_STAGING_DIR)$(GSWEATHER_INSTALL_PATH)$(ECHO_END)
-	
-	# Sign
-	$(ECHO_NOTHING)ldid -Sentitlements.xml $(THEOS_STAGING_DIR)$(GSWEATHER_INSTALL_PATH)/GSWeather.framework/GSWeather$(ECHO_END)
-	
+endif
+
 	# Copy to theos/lib
 	$(ECHO_NOTHING)rm -rf $(MOVE_TO_THEOS_PATH)GSWeather.framework/$(ECHO_END)
 	$(ECHO_NOTHING)cp -r $(THEOS_STAGING_DIR)$(GSWEATHER_INSTALL_PATH)/GSWeather.framework $(MOVE_TO_THEOS_PATH)$(ECHO_END)

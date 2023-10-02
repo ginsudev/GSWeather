@@ -14,15 +14,17 @@ public final class WeatherProvider {
     private let service: WeatherService
     private let locationProvider: LocationProvider
     
-    private var location = PassthroughSubject<CLLocation, Never>()
-    private var locationName = PassthroughSubject<String?, Never>()
-    private var fetchedWeather = PassthroughSubject<WeatherDisplayable, Never>()
+    private let location = PassthroughSubject<CLLocation, Never>()
+    private let fetchedWeather = PassthroughSubject<WeatherDisplayable, Never>()
+    private let currentWeatherSubject = CurrentValueSubject<WeatherModel?, Never>(nil)
     
-    public var currentWeather = CurrentValueSubject<WeatherModel?, Never>(nil)
+    public var currentWeatherPublisher: AnyPublisher<WeatherModel?, Never> {
+        currentWeatherSubject.eraseToAnyPublisher()
+    }
     
     public init() {
-        self.service = .init()
-        self.locationProvider = .init()
+        service = .init()
+        locationProvider = .init()
         subscribe()
     }
      
@@ -38,20 +40,18 @@ public final class WeatherProvider {
 private extension WeatherProvider {
     func subscribe() {
         // Get location name after location stored
-        location
+        let locationNamePublisher = location
             .flatMap(locationProvider.getLocationName)
-            .sink { [weak self] in self?.locationName.send($0) }
-            .store(in: &bag)
         
         // Store weather after successful fetch
-        service.fetchedWeather
+        service.fetchedWeatherPublisher
             .sink { [weak self] in self?.fetchedWeather.send($0) }
             .store(in: &bag)
         
         // Wait until location name and weather have been stored, then merge and send.
-        Publishers.Zip(fetchedWeather, locationName)
+        Publishers.Zip(fetchedWeather, locationNamePublisher)
             .map { WeatherModel(displayable: $0, locationName: $1) }
-            .sink { [weak self] in self?.currentWeather.send($0) }
+            .sink { [weak self] in self?.currentWeatherSubject.send($0) }
             .store(in: &bag)
     }
 }
